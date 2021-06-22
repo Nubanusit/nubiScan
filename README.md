@@ -5,13 +5,13 @@ nubiScan is a general purpose bar-code scanner application. It reads in a bar-co
 3. A asset ID: The exact identifier for the thing the bar-code is attached to.
 Its format looks like this: 'NUBI-<processID>-<assetID>' for example 'NUBI-ET1-0000' will trigger the ET1 process on the 0000 asset.
 
-#Process IDs
+# Process IDs
 As of right now there are two process IDs.
 
-##NAME
+## NAME
 This is a special process ID used to track the name of the person using the bar-code scanner. It passes this information on to other process IDs. The user can then scan as many other bar-codes as they like. After each bar-code scanned the user has three minutes to scan in another bar-code before they need to scan in their name again. This allows a user to scan in as many things as they have on hand with out needing to scan their name each time. A new name can be scanned at any time. 
 
-##ET1
+## ET1
 The ET1 process is used for inventory control. It allows a user to check out and return equipment. The first step is for the user to scan their name off of a sheet, then the user can check out any equipment they like. Then when they wish to return it all they have to do is to scan the bar-code again. A name is not required to return equipment its only required to check it out. This process updates the Google sheet used to track all the equipment. The bar-code needs to be listed in the 'Asset ID' column. When something is checked out the 'Checked out to (Name)' column is updated with the user's name. 
 
 ## Diagrams
@@ -44,14 +44,14 @@ Do these steps from your Windows, Mac or Chromebook.
 Pick whichever one you like. I prefer the 'Raspberry Pi OS Lite' image because it is smaller. But you might prefer one that has desktop support, with a more traditional GUI.
 
 2. Next you need to download an installer from here: [Raspberry Pi Imager](https://www.raspberrypi.org/software/) This allows you to write the OS image to an SD card. 
-  * Or for Chromebooks follow [These instructions](https://www.raspberrypi.org/documentation/installation/installing-images/chromeos.md)
+  1. Or for Chromebooks follow [These instructions](https://www.raspberrypi.org/documentation/installation/installing-images/chromeos.md)
 3. Install the imager and follow it's instructions for installing the OS you downloaded in step one.
 
 ### Pre-configure your new Raspberry Pi image
 Also do these steps from your Windows, Mac or Chromebook. 
-1. Setup the network:
-   * Setup wifi for nubiNet: [Setting up a Raspberry Pi headless](https://www.raspberrypi.org/documentation/configuration/wireless/headless.md)
-   * Enable ssh: Follow instructions in section three 'Enable SSH on a headless Raspberry Pi' [SSH (Secure Shell)](https://www.raspberrypi.org/documentation/remote-access/ssh/README.md)
+Setup the network:
+1. Setup wifi for nubiNet: [Setting up a Raspberry Pi headless](https://www.raspberrypi.org/documentation/configuration/wireless/headless.md)
+2. Enable ssh: Follow instructions in section three 'Enable SSH on a headless Raspberry Pi' [SSH (Secure Shell)](https://www.raspberrypi.org/documentation/remote-access/ssh/README.md)
 
 ### First time boot
 1. Remove the SD card from your computer and put in into the Raspberry Pi.
@@ -76,9 +76,9 @@ On a headless system (a system with out a monitor) it can be difficult to find t
 1. Temporarily plug in a monitor and use the ```ifconfig``` command to see what the IP address is.
 2. Use a network scanner to list all the devices on a network. Like this for Android: [fing](https://play.google.com/store/apps/details?id=com.overlook.android.fing&hl=en_US&gl=US)
 3. Use mDNS (Multicast DNS): This is the easiest to use and my preferred method.
-  * Apple's Bonjour service supports this and is naively installed. (I think...is this really true?)
-  * This is supported out of the box in Win10.
-  * If this is not working on your Mac or Windows box or you have a linux or Chrombook install avahi discovery or Bonjour. (Google can help you with this.)
+    * Apple's Bonjour service supports this and is naively installed. (I think...is this really true?)
+    * This is supported out of the box in Win10.
+    * If this is not working on your Mac or Windows box or you have a linux or Chrombook install avahi discovery or Bonjour. (Google can help you with this.)
   At this point you can always refer to your scanner with its mDNS <hostname>.local. For example: nubiscan1.local
 
 Now that you can address the raspberry by either its IP address or its mDNS name, you can use this command to ssh into the system: ```ssh pi@<address>``` Use the default 'pi' username. 
