@@ -10,7 +10,7 @@ from google.auth import exceptions
 class nubiInventory:
     #Nubi ET inventory Test
     SPREADSHEET_ID = '1smNVdIyMudt2V321mtnUkkN9J8vD5euAzD0eGn2BO_Y'
-    CREDENTIALS_FILE = '/home/pi/playground/nubiScan/nubibot2000-credentials.json'
+    CREDENTIALS_FILE = '~/nubiScan/nubibot2000-credentials.json'
     sheet = None
     firstRow = None
 

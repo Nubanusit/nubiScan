@@ -1,6 +1,3 @@
-[submodule "nubiScan/kbdPicker"]
-	path = kbdPicker
-	url = https://github.com/cscottlamb/kbdPicker.git
 [submodule "kbdPicker"]
 	path = kbdPicker
 	url = https://github.com/cscottlamb/kbdPicker.git
