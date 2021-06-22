@@ -30,7 +30,7 @@ def main():
     tts = ttsPlayer()
     ET1 = nubiInventory()
     userName = None
-    usbPort = '1.4'
+    usbPort = '1.3'
     lastUsed = time.time() + USER_INACTIVITY_TIMEOUT_SEC # Always make sure we init this to the past
 
     while True:
