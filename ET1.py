@@ -9,7 +9,9 @@ from google.auth import exceptions
 #innovatory spread sheet.
 class nubiInventory:
     #Nubi ET inventory Test
-    SPREADSHEET_ID = '1smNVdIyMudt2V321mtnUkkN9J8vD5euAzD0eGn2BO_Y'
+#    SPREADSHEET_ID = '1smNVdIyMudt2V321mtnUkkN9J8vD5euAzD0eGn2BO_Y' #Test sheet
+    SPREADSHEET_ID = '1TSyyx8RIoGnWmjBRkdPQILtYQzK1mEjLYLbIxEhNidQ' #live sheet
+    
     CREDENTIALS_FILE = 'nubibot2000-credentials.json'
     sheet = None
     firstRow = None
@@ -104,6 +106,7 @@ class nubiInventory:
 
     def run(self, userName:str, assetId: str):
         #Step 1: Read the column with all the assetIds
+        self.dump()
         listOfItems = self.readColByName('Asset ID')
 
         #Step 2: Find the row for this asset
