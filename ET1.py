@@ -126,16 +126,23 @@ class nubiInventory:
         checkedOutTo = self.readCellByName('Checked out to (Name)', row)
         print(f"checkedOutTo == {checkedOutTo}")
 
+        #Step 4: Get the asset name
+        itemName = self.readCellByName('Item Description', row)
+        if not itemName:
+            itemName = assetId.split('-')[2]
+        print(f"itemName == {itemName}")
+
+        #Step 5: return a string that tells you what happened
         if checkedOutTo:
-            #Step 4a: Mark this asset as returned
+            #Step 5a: Mark this asset as returned
             print(f"{assetId} was checked out to {checkedOutTo[0][0]} but {userName} returned it.")
             self.clearCellByName('Checked out to (Name)', row)
-            return f"{assetId.split('-')[2]} returned"
+            return f"{itemName} returned"
         else:
-            #Step 4b: Mark this asset as being used by userName
+            #Step 5b: Mark this asset as being used by userName
             print(f"{assetId} is checked out to {userName}")
             self.writeCellByName('Checked out to (Name)', row, userName)
-            return f"{assetId.split('-')[2]} checked out to {userName}"
+            return f"{itemName} checked out to {userName}"
 
 if __name__ == "__main__":
     ET1 = nubiInventory()
