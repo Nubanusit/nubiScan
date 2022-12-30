@@ -1,9 +1,11 @@
 import os.path
+from datetime import datetime
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from google.oauth2 import service_account
 from google.auth import exceptions
+from googleapiclient.errors import HttpError
 
 #This class encompasses the knowledge of how to interact with Nubi's
 #innovatory spread sheet.
@@ -17,10 +19,17 @@ class nubiInventory:
     firstRow = None
 
     def __init__(self):
-        service = self.__serviceSetup()
-        # Call the Sheets API
-        self.sheet = service.spreadsheets()
-        self.firstRow = self.__readRange(f'a1:$1')
+        try:
+            service = self.__serviceSetup()
+            # Call the Sheets API
+            self.sheet = service.spreadsheets()
+            self.firstRow = self.__readRange(f'a1:$1')
+        except (exceptions.TransportError, HttpError, OSError) as error:
+            print(f"Network error occurred: {error}")
+            raise self.NetworkErrorException
+
+    class NetworkErrorException(Exception):
+        pass
 
     def __serviceSetup(self):
         """Shows basic usage of the Sheets API.
@@ -40,7 +49,7 @@ class nubiInventory:
         values = result.get('values', [])
 
         if not values:
-#            print('No data found.')
+            # No data found
             return None
         else:
             return values
@@ -84,7 +93,11 @@ class nubiInventory:
 
     def readCellByName(self, colName: str, row: str):
         col = self.__getColLetterFromName(colName)
-        return self.readCell(col, row)
+        cell = self.readCell(col, row)
+        if cell:
+            return cell[0]
+        else:
+            return None
 
     def readColByName(self, name: str):
         col = self.__getColLetterFromName(name)
@@ -105,45 +118,58 @@ class nubiInventory:
                 print(row)
 
     def run(self, userName:str, assetId: str):
-        #Step 1: Read the column with all the assetIds
-        self.dump()
-        listOfItems = self.readColByName('Asset ID')
+        try:
+            #Step 1: Read the column with all the assetIds
+            #self.dump()
+            listOfItems = self.readColByName('Asset ID')
 
-        #Step 2: Find the row for this asset
-        row = None
-        i = 1
-        for x in listOfItems:
-            if x and x[0] == assetId:
-                row = str(i)
-                print(f"found {assetId} in row {row}")
-                break
-            i += 1
-        if not row:
-            print(f"Could not find [{assetId}]")
-            return f"Could not find [{assetId}]"
+            #Step 2: Find the row for this asset
+            row = None
+            i = 1
+            for x in listOfItems:
+                if x and x[0] == assetId:
+                    row = str(i)
+                    print(f"found {assetId} in row {row}")
+                    break
+                i += 1
+            if not row:
+                print(f"Could not find {assetId}")
+                return f"Could not find {assetId}"
 
-        #Step 3: Check to see if this asset is already checked out
-        checkedOutTo = self.readCellByName('Checked out to (Name)', row)
-        print(f"checkedOutTo == {checkedOutTo}")
+            #Step 3: Check to see if this asset is already checked out
+            checkedOutTo = self.readCellByName('Checked out to (Name)', row)
+            print(f"checkedOutTo == {checkedOutTo}")
 
-        #Step 4: Get the asset name
-        itemName = self.readCellByName('Item Description', row)
-        if not itemName:
-            itemName = assetId.split('-')[2]
-        print(f"itemName == {itemName}")
+            #Step 4: Get the asset name
+            itemName = self.readCellByName('Item Description', row)
+            if not itemName:
+                itemName = assetId.split('-')[2][0]
+            else:
+                itemName = itemName[0]
+            print(f"itemName == {itemName}")
 
-        #Step 5: return a string that tells you what happened
-        if checkedOutTo:
-            #Step 5a: Mark this asset as returned
-            print(f"{assetId} was checked out to {checkedOutTo[0][0]} but {userName} returned it.")
-            self.clearCellByName('Checked out to (Name)', row)
-            return f"{itemName} returned"
-        else:
-            #Step 5b: Mark this asset as being used by userName
-            print(f"{assetId} is checked out to {userName}")
-            self.writeCellByName('Checked out to (Name)', row, userName)
-            return f"{itemName} checked out to {userName}"
+            #Step 5: Do the check out/in then return a string that tells you what happened
+            if checkedOutTo:
+                #Step 5a: Mark this asset as returned
+                print(f"{assetId} was checked out to {checkedOutTo[0]} but {userName} returned it.")
+                self.clearCellByName('Checked out to (Name)', row)
+                self.clearCellByName('Checkout Date', row )
+                return f"{itemName} returned"
+            else:
+                #Step 5b: Mark this asset as being used by userName
+                print(f"{assetId} is checked out to {userName}")
+                now = datetime.now()
+                dateTime = now.strftime("%m/%d/%Y %H:%M")
+                self.writeCellByName('Checked out to (Name)', row, userName)
+                self.writeCellByName('Checkout Date', row, dateTime)
+                return f"{itemName} checked out to {userName}"
+        except (HttpError, ConnectionResetError) as error:
+            print(f"Network error occurred: {error}")
+            raise self.NetworkErrorException
 
 if __name__ == "__main__":
-    ET1 = nubiInventory()
-    print(f"{ET1.run('Scott', 'NUBI-ET1-TestCode0001')}")
+    try:
+        ET1 = nubiInventory()
+        print(f"{ET1.run('Scott', 'NUBI-ET1-TestCode0001')}")
+    except nubiInventory.NetworkErrorException:
+        print(f"Network error occurred.")

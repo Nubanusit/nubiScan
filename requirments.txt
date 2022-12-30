@@ -3,3 +3,4 @@ google-auth-httplib2==0.1.0
 google-auth-oauthlib==0.4.3
 gTTS==2.2.2
 audiosegment==0.23.0
+ioctl-opt==1.2.2
